@@ -1,42 +1,20 @@
-import ManagementPanel from '@/components/management-panel'
-import OperationSettingsPanel from '@/components/operation-settings-panel'
-import SalesConsole from '@/components/sales-console'
-import { requireRole } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
-import { brl } from '@/lib/format'
-import { DEFAULT_GOAL_TIERS, normalizeGoalTiers } from '@/lib/goals'
-import { getSalesWorkspace } from '@/lib/data'
+import { getRegisteredExecutives } from '@/lib/data'
+import { OperatorCard } from '@/components/operator-card'
 
-export const dynamic = 'force-dynamic'
+export const dynamic='force-dynamic'
 
-export default async function ManagementPage() {
-  const viewer = await requireRole(['admin', 'manager'])
-  const supabase = await createClient()
-  const [{ data: profiles }, { data: teams }, { data: summary }, salesData, { data: campaign }] = await Promise.all([
-    supabase.from('profiles').select('id,full_name,email,role,active,team_id,teams(name)').order('full_name'),
-    supabase.from('teams').select('id,name').eq('active', true).order('name'),
-    supabase.from('operation_summary').select('*').limit(1).maybeSingle(),
-    getSalesWorkspace(viewer.id, viewer.profile.role),
-    supabase.from('campaigns').select('*').eq('active', true).order('start_date', { ascending: false }).limit(1).maybeSingle(),
+export default async function SquadPage({searchParams}:{searchParams:Promise<{team?:string}>}){
+  const params=await searchParams
+  const supabase=await createClient()
+  const [operators,{data:teams}]=await Promise.all([
+    getRegisteredExecutives(),
+    supabase.from('teams').select('id,name,slug').eq('active',true).order('name'),
   ])
-
-  const list = profiles || []
-  let goalRows = normalizeGoalTiers(DEFAULT_GOAL_TIERS)
-
-  if (campaign?.id) {
-    const { data: goals, error } = await supabase.from('goal_tiers').select('*').eq('campaign_id', campaign.id).eq('active', true).order('sort_order')
-    if (!error && goals?.length) goalRows = normalizeGoalTiers(goals as any)
-  }
-
-  return <div className="content max">
-    <div className="page-kicker">COMANDO // VENDAS, APROVAÇÕES, METAS E ACESSOS</div><h1 className="page-title">Gestão</h1><p className="page-sub">Central operacional do gestor. Registre vendas já validadas, aprove envios dos executivos, ajuste metas e premiações e administre os acessos da equipe.</p>
-    <div className="metric-grid"><div className="metric"><div className="label">Executivos ativos</div><div className="value">{list.filter((p: any) => p.active && p.role === 'executive').length}</div></div><div className="metric"><div className="label">Aguardando aprovação</div><div className="value">{summary?.pending_sales || 0}</div></div><div className="metric"><div className="label">VGV aprovado</div><div className="value">{brl(summary?.confirmed_vgv || 0)}</div></div><div className="metric"><div className="label">Vendas aprovadas</div><div className="value">{summary?.approved_sales || 0}</div></div></div>
-
-    <OperationSettingsPanel initialCampaign={campaign as any} initialGoals={goalRows as any} viewerRole={viewer.profile.role} />
-
-    <SalesConsole viewerId={viewer.id} viewerRole={viewer.profile.role} campaign={salesData.campaign} executives={salesData.executives} initialSales={salesData.sales} compact />
-
-    <div className="section-head"><h2>Usuários e <b>Acessos</b></h2><div className="line" /><div className="meta">{viewer.profile.role === 'admin' ? 'edição liberada' : 'somente leitura'}</div></div>
-    <ManagementPanel initialProfiles={list as any} teams={teams || []} viewerRole={viewer.profile.role} />
+  const filtered=(operators||[]).filter((o:any)=>!params.team||o.team_name===params.team)
+  return <div className="content max"><div className="page-kicker">OPERAÇÃO RESULTADO // EXECUTIVOS CADASTRADOS</div><h1 className="page-title">Esquadrão</h1><p className="page-sub">Aqui aparecem somente usuários ativos com perfil Executivo de Vendas. Ranking e VGV consideram exclusivamente vendas aprovadas.</p>
+    <div className="section-head"><h2>Squads da <b>Operação</b></h2><div className="line"/><div className="meta">filtre os executivos</div></div><div className="toolbar"><div className="filters"><a className={!params.team?'primary-btn':'ghost-btn'} href="/esquadrao">Todos</a>{(teams||[]).map((t:any)=><a key={t.id} className="ghost-btn" href={`/esquadrao?team=${encodeURIComponent(t.name)}`}>{t.name}</a>)}</div></div>
+    <div className="squad-grid">{filtered.map((op:any,index:number)=><OperatorCard key={op.id} op={op} index={index} />)}</div>
+    {!filtered.length&&<div className="empty-warroom">Nenhum executivo cadastrado neste squad.</div>}
   </div>
 }

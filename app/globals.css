@@ -15,7 +15,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1000;o
 .login-art:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 40%,rgba(69,200,255,.10),transparent 38%),linear-gradient(180deg,transparent 55%,#081320 100%)}
 .login-copy{position:absolute;z-index:2;left:7vw;bottom:11vh;max-width:620px}.login-copy .eyebrow{color:var(--lime);letter-spacing:.26em;font:600 12px JetBrains Mono}.login-copy h1{font:800 clamp(54px,7vw,96px)/.86 'Barlow Condensed';margin:14px 0 16px;text-transform:uppercase;color:#f4f7f2;text-shadow:0 10px 40px #000}.login-copy p{font:600 20px/1.3 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:#d9ebff;max-width:620px}
 .login-panel{position:relative;display:flex;align-items:center;justify-content:center;padding:42px;background:linear-gradient(180deg,#0c1827,#081320)}
-.login-box{width:min(420px,100%);border:1px solid rgba(69,200,255,.24);background:rgba(9,15,12,.88);box-shadow:0 40px 90px rgba(0,0,0,.45);padding:34px}.login-box .brand{display:block;width:200px;max-width:100%;height:auto!important;object-fit:contain;margin:0 0 34px}.login-box h2{font:700 28px 'Barlow Condensed';text-transform:uppercase;color:#fff;margin:0 0 8px}.login-box p{color:var(--muted);font-size:13px;line-height:1.5}.field{display:grid;gap:7px;margin:17px 0}.field label{font:600 11px JetBrains Mono;color:#88938b;text-transform:uppercase;letter-spacing:.08em}.field input,.field select,.tactical-select{height:46px;border:1px solid rgba(204,218,207,.18);background:#091624;color:#edf2ed;padding:0 13px;outline:none}.field input:focus,.field select:focus,.tactical-select:focus{border-color:var(--lime);box-shadow:0 0 0 2px rgba(69,200,255,.08)}
+.login-box{width:min(420px,100%);border:1px solid rgba(69,200,255,.24);background:rgba(9,15,12,.88);box-shadow:0 40px 90px rgba(0,0,0,.45);padding:34px}.login-box .brand{width:200px;margin-bottom:34px}.login-box h2{font:700 28px 'Barlow Condensed';text-transform:uppercase;color:#fff;margin:0 0 8px}.login-box p{color:var(--muted);font-size:13px;line-height:1.5}.field{display:grid;gap:7px;margin:17px 0}.field label{font:600 11px JetBrains Mono;color:#88938b;text-transform:uppercase;letter-spacing:.08em}.field input,.field select,.tactical-select{height:46px;border:1px solid rgba(204,218,207,.18);background:#091624;color:#edf2ed;padding:0 13px;outline:none}.field input:focus,.field select:focus,.tactical-select:focus{border-color:var(--lime);box-shadow:0 0 0 2px rgba(69,200,255,.08)}
 .primary-btn,.ghost-btn,.danger-btn{border:0;cursor:pointer;text-transform:uppercase;letter-spacing:.09em;font:700 13px 'Barlow Condensed';height:44px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:9px}.primary-btn{background:var(--lime);color:#0a1623;box-shadow:0 0 22px rgba(69,200,255,.12)}.primary-btn:hover{background:#d6ff4a}.ghost-btn{border:1px solid rgba(69,200,255,.36);background:rgba(69,200,255,.02);color:#e8eee9}.danger-btn{border:1px solid rgba(217,91,84,.4);background:rgba(217,91,84,.07);color:#ffc0bb}.wide{width:100%}.form-msg{font-size:12px;color:#d8c373;margin-top:12px}
 
 /* app shell */
@@ -197,193 +197,53 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1000;o
 
 @keyframes dustFloat{0%{transform:translate3d(0,0,0) scale(.9);opacity:0}8%{opacity:.32}50%{opacity:.22}100%{transform:translate3d(-18px,-140px,0) scale(1.45);opacity:0}}
 
-/* operation goals admin */
-.operation-settings-msg{margin-top:6px;margin-bottom:14px}
-.operation-admin-panel{display:grid;gap:16px;padding:18px}
-.operation-admin-block{border:1px solid var(--line);background:linear-gradient(180deg,#0c1826,#09131e);padding:18px}
-.operation-admin-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
-.operation-admin-head h3{margin:8px 0 4px;font:800 28px 'Barlow Condensed';text-transform:uppercase;color:#fff}
-.admin-config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.admin-config-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.admin-grid-span-2{grid-column:1/-1}
-.goal-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.goal-admin-card{border:1px solid rgba(69,200,255,.16);background:linear-gradient(180deg,rgba(69,200,255,.03),rgba(0,0,0,.12));padding:14px}
-.goal-admin-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-.goal-admin-index{font:700 10px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:var(--lime)}
-.goal-admin-badge{font:700 10px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#9fb2c8}
+/* Sales marks + multikill badges */
+.operator-card{min-height:560px}
+.operator-img{height:360px}
+.operator-body{display:flex;flex-direction:column;gap:8px;padding:6px 15px 18px}
+.operator-role{margin-top:4px}
+.operator-stats{margin-top:10px}
 
-/* goal cards + progress */
-.badge-level-grid{align-items:stretch}
-.badge-level{border-radius:2px;transform:translateY(0);transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-.badge-level:hover{transform:translateY(-2px)}
-.badge-level-copy{flex:1;position:relative;z-index:2}
-.objective-seal,.campaign-complete-seal{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border:1px solid rgba(127,215,255,.42);background:linear-gradient(180deg,rgba(127,215,255,.18),rgba(127,215,255,.06));color:#e9f9ff;font:800 9px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;box-shadow:0 0 0 1px rgba(255,255,255,.06) inset,0 12px 30px rgba(0,0,0,.22)}
-.campaign-complete-seal{top:14px;right:14px}
-.level-progress-wrap{margin-top:12px}
-.level-progress-head{display:flex;justify-content:space-between;gap:10px;font:700 8px 'JetBrains Mono';letter-spacing:.1em;text-transform:uppercase;color:#9cadbf;margin-bottom:6px}
-.level-progress-track{height:10px;border:1px solid rgba(69,200,255,.16);background:rgba(7,12,18,.8);overflow:hidden;position:relative}
-.level-progress-track:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 10px,transparent 10px 20px)}
-.level-progress-fill{height:100%;width:var(--tier-progress,0);background:linear-gradient(90deg,#133e66,#45c8ff,#8be4ff);background-size:200% 100%;animation:fillBar .9s cubic-bezier(.25,1,.3,1),progressShine 2.4s linear infinite}
-.level-progress-fill.done{background:linear-gradient(90deg,#1d4d61,#6fe8ff,#c8ffff)}
-.war-progress{position:relative;overflow:hidden}
-.animated-meter{width:var(--target-width,0);animation:fillBar 1.2s cubic-bezier(.2,.9,.2,1),progressShine 2.5s linear infinite}
+.sales-marks{margin-top:8px;padding:10px 10px 12px;border:1px solid rgba(69,200,255,.14);background:linear-gradient(180deg,rgba(6,14,22,.84),rgba(4,10,16,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.sales-marks-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sales-marks-head span{font:700 8px 'JetBrains Mono';letter-spacing:.14em;text-transform:uppercase;color:#73cfff}
+.sales-marks-head b{font:800 9px 'Barlow Condensed';letter-spacing:.08em;text-transform:uppercase;color:#eaf6ff}
+.sales-skull-row{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:8px;min-height:18px}
+.sales-skull-icon{width:18px;height:18px;display:block;object-fit:contain;filter:drop-shadow(0 5px 10px rgba(0,0,0,.32))}
+.sales-skull-empty,.sales-skull-extra{font:700 8px 'JetBrains Mono';letter-spacing:.1em;text-transform:uppercase;color:#8da2b4}
+.sales-badge-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}
+.sales-badge-chip{display:flex;align-items:center;gap:6px;padding:6px 5px;border:1px solid rgba(69,200,255,.14);background:rgba(255,255,255,.02);opacity:.42;min-height:50px;transition:.18s}
+.sales-badge-chip img{width:28px;height:28px;object-fit:contain;filter:grayscale(1) brightness(.7)}
+.sales-badge-chip strong{display:block;font:800 9px 'Barlow Condensed';letter-spacing:.04em;text-transform:uppercase;color:#9badba;line-height:1}
+.sales-badge-chip small{display:block;margin-top:2px;font:600 7px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#6f8190}
+.sales-badge-chip.active{opacity:1;border-color:rgba(69,200,255,.32);background:linear-gradient(180deg,rgba(69,200,255,.08),rgba(255,255,255,.02));box-shadow:0 0 18px rgba(69,200,255,.06)}
+.sales-badge-chip.active img{filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+.sales-badge-chip.active strong{color:#f4fbff}
+.sales-badge-chip.active small{color:#9fe0ff}
+.sales-badge-chip.locked{filter:saturate(.75)}
+.sales-marks.compact{padding:9px 9px 10px}
+.sales-marks.compact .sales-skull-icon{width:15px;height:15px}
+.sales-marks.compact .sales-badge-chip{padding:5px 4px;min-height:46px}
+.sales-marks.compact .sales-badge-chip img{width:24px;height:24px}
+.sales-marks.compact .sales-badge-chip strong{font-size:8px}
+.sales-marks.compact .sales-badge-chip small{font-size:6px}
 
-/* entrance animations */
-.page-enter .reveal{opacity:0;transform:translateY(18px);animation:fadeUp .65s cubic-bezier(.22,.96,.28,1) forwards}
-.page-enter .reveal-1{animation-delay:.04s}
-.page-enter .reveal-2{animation-delay:.12s}
-.page-enter .reveal-3{animation-delay:.20s}
-.page-enter .reveal-4{animation-delay:.28s}
-.page-enter .reveal-5{animation-delay:.36s}
+.mvp-card,.podium-card{min-height:460px}
+.mvp-copy .sales-marks,.podium-copy .sales-marks{margin-top:12px;backdrop-filter:blur(2px);background:linear-gradient(180deg,rgba(3,8,14,.74),rgba(3,8,14,.88));border-color:rgba(69,200,255,.16)}
+.mvp-copy .sales-marks{max-width:390px}
+.podium-copy .sales-marks{max-width:100%}
+.podium-copy .sales-badge-row{gap:4px}
+.podium-copy .sales-badge-chip{min-height:40px}
+.podium-copy .sales-badge-chip img{width:20px;height:20px}
+.podium-copy .sales-badge-chip strong{font-size:7px}
+.podium-copy .sales-badge-chip small{font-size:6px}
 
-@keyframes fillBar{from{width:0}to{width:var(--target-width,var(--tier-progress,0))}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
-@media(max-width:1100px){.goal-admin-grid,.admin-config-grid{grid-template-columns:1fr}.admin-grid-span-2{grid-column:auto}.operation-admin-head{flex-direction:column;align-items:flex-start}}
-
-
-/* === REPARO FINAL: metas + login logo === */
-.login-box .brand{
-  display:block;
-  width:200px;
-  max-width:100%;
-  height:auto!important;
-  object-fit:contain!important;
-  object-position:left center;
-  margin:0 0 34px;
+@media(max-width:1380px){
+  .operator-img{height:330px}
 }
-
-/* Barras individuais de cada objetivo */
-.badge-level-copy{
-  flex:1;
-  min-width:0;
-  position:relative;
-  z-index:2;
+@media(max-width:900px){
+  .operator-card{min-height:520px}
+  .operator-img{height:320px}
+  .sales-badge-row{grid-template-columns:1fr}
+  .sales-marks.compact .sales-badge-row{grid-template-columns:1fr}
 }
-.level-progress-wrap{
-  display:block;
-  width:100%;
-  margin-top:12px;
-}
-.level-progress-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  width:100%;
-  margin-bottom:7px;
-  font:700 8px 'JetBrains Mono';
-  letter-spacing:.10em;
-  text-transform:uppercase;
-  color:#9cadbf;
-}
-.level-progress-head span:last-child{
-  margin-left:auto;
-  color:#dff7ff;
-}
-.level-progress-track{
-  display:block;
-  position:relative;
-  width:100%;
-  height:9px;
-  overflow:hidden;
-  border:1px solid rgba(69,200,255,.22);
-  background:rgba(4,12,20,.9);
-}
-.level-progress-track:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(
-    90deg,
-    rgba(255,255,255,.035) 0 10px,
-    transparent 10px 20px
-  );
-}
-.level-progress-fill{
-  position:relative;
-  display:block;
-  height:100%;
-  width:var(--tier-progress,0%);
-  min-width:0;
-  background:linear-gradient(90deg,#0f5f91,#1ea3ff,#6ddcff);
-  background-size:200% 100%;
-  box-shadow:0 0 14px rgba(69,200,255,.22);
-  animation:fillTierBar .9s cubic-bezier(.25,1,.3,1),progressShine 2.4s linear infinite;
-}
-.level-progress-fill.done{
-  background:linear-gradient(90deg,#217896,#59d9ff,#c2f7ff);
-}
-
-/* Barra geral: azul/ciano Menfe, nunca verde */
-.war-progress .progress-track{
-  position:relative;
-  overflow:hidden;
-  background:rgba(4,12,20,.95);
-  border:1px solid rgba(69,200,255,.20);
-}
-.war-progress .progress-fill,
-.war-progress .animated-progress,
-.war-progress .animated-meter{
-  position:relative;
-  height:100%;
-  width:var(--target-width,0%);
-  background:linear-gradient(90deg,#0e5f91 0%,#1ea3ff 45%,#65dcff 100%)!important;
-  background-size:200% 100%!important;
-  box-shadow:0 0 18px rgba(69,200,255,.22);
-  animation:fillGeneralBar 1.15s cubic-bezier(.2,.9,.2,1),progressShine 2.5s linear infinite!important;
-}
-.war-progress .progress-fill:after,
-.war-progress .animated-progress:after,
-.war-progress .animated-meter:after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(
-    135deg,
-    rgba(255,255,255,.12) 0 8px,
-    transparent 8px 16px
-  );
-  animation:stripeMove 1s linear infinite;
-}
-
-/* Selo militar de objetivo concluído */
-.objective-seal,
-.campaign-complete-seal{
-  position:absolute;
-  top:12px;
-  right:12px;
-  z-index:5;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:26px;
-  padding:0 12px;
-  border:1px solid rgba(102,220,255,.52);
-  background:linear-gradient(180deg,rgba(63,188,231,.22),rgba(20,78,104,.24));
-  color:#eafaff;
-  font:800 9px 'JetBrains Mono';
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 0 20px rgba(69,200,255,.10);
-}
-.campaign-complete-seal{top:14px;right:14px}
-
-@keyframes fillTierBar{
-  from{width:0}
-  to{width:var(--tier-progress,0%)}
-}
-@keyframes fillGeneralBar{
-  from{width:0}
-  to{width:var(--target-width,0%)}
-}
-
-/* Admin: apagar venda */
-.sale-delete-icon{color:#ff9d95!important;border-color:rgba(227,109,100,.34)!important}
-.sale-delete-icon:hover{color:#fff!important;background:rgba(227,109,100,.14)!important;border-color:#e36d64!important}
-.sale-delete-modal{border-color:rgba(227,109,100,.34)}
-.sale-delete-warning{display:inline-flex;height:26px;align-items:center;padding:0 10px;border:1px solid rgba(227,109,100,.42);background:rgba(227,109,100,.08);color:#ffaaa3;font:800 9px 'JetBrains Mono';letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
-.sale-delete-summary{padding:14px;margin-top:14px;border-color:rgba(227,109,100,.16)}
-.sale-delete-title{font:800 24px 'Barlow Condensed';color:#fff;text-transform:uppercase;margin-top:6px}
-.sale-delete-value{font:900 30px 'Barlow Condensed';color:#ffaaa3;margin-top:6px}
-.sale-delete-customer{font-size:12px;color:#7f95ac;margin-top:4px}
