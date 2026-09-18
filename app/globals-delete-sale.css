@@ -1,0 +1,10 @@
+
+/* Admin: apagar venda */
+.sale-delete-icon{color:#ff9d95!important;border-color:rgba(227,109,100,.34)!important}
+.sale-delete-icon:hover{color:#fff!important;background:rgba(227,109,100,.14)!important;border-color:#e36d64!important}
+.sale-delete-modal{border-color:rgba(227,109,100,.34)}
+.sale-delete-warning{display:inline-flex;height:26px;align-items:center;padding:0 10px;border:1px solid rgba(227,109,100,.42);background:rgba(227,109,100,.08);color:#ffaaa3;font:800 9px 'JetBrains Mono';letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+.sale-delete-summary{padding:14px;margin-top:14px;border-color:rgba(227,109,100,.16)}
+.sale-delete-title{font:800 24px 'Barlow Condensed';color:#fff;text-transform:uppercase;margin-top:6px}
+.sale-delete-value{font:900 30px 'Barlow Condensed';color:#ffaaa3;margin-top:6px}
+.sale-delete-customer{font-size:12px;color:#7f95ac;margin-top:4px}

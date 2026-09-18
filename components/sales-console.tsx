@@ -8,14 +8,23 @@ function money(value:number|string){
   return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Number(value||0))
 }
 
+function parseMoney(value:string){
+  const cleaned=String(value||'').trim().replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.')
+  return Number(cleaned)
+}
+
 export default function SalesConsole({viewerId,viewerRole,campaign,executives,initialSales,compact=false}:{viewerId:string;viewerRole:string;campaign:any;executives:any[];initialSales:any[];compact?:boolean}){
   const supabase=useMemo(()=>createClient(),[])
   const router=useRouter()
   const manager=viewerRole==='admin'||viewerRole==='manager'
+  const isAdmin=viewerRole==='admin'
   const [sales,setSales]=useState(initialSales||[])
   const [busy,setBusy]=useState(false)
   const [msg,setMsg]=useState('')
   const [showForm,setShowForm]=useState(!compact)
+  const [editingSale,setEditingSale]=useState<any|null>(null)
+  const [editVgv,setEditVgv]=useState('')
+  const [deletingSale,setDeletingSale]=useState<any|null>(null)
 
   async function refresh(){
     const query=supabase.from('sales_submissions').select('*,executive:profiles!sales_submissions_executive_id_fkey(full_name,email),approver:profiles!sales_submissions_approved_by_fkey(full_name)').order('created_at',{ascending:false}).limit(manager?200:100)
@@ -30,7 +39,7 @@ export default function SalesConsole({viewerId,viewerRole,campaign,executives,in
       if(!campaign?.id)throw new Error('Nenhuma campanha ativa encontrada.')
       const executiveId=manager?String(form.get('executive_id')||''):viewerId
       if(!executiveId)throw new Error('Selecione o executivo.')
-      const vgv=Number(String(form.get('vgv')||'').replace(/\./g,'').replace(',','.'))
+      const vgv=parseMoney(String(form.get('vgv')||''))
       if(!Number.isFinite(vgv)||vgv<=0)throw new Error('Informe um VGV válido.')
       const payload={
         campaign_id:campaign.id,
@@ -61,6 +70,59 @@ export default function SalesConsole({viewerId,viewerRole,campaign,executives,in
       setMsg(status==='approved'?'VENDA APROVADA. PONTUAÇÃO ATUALIZADA.':'VENDA REJEITADA.')
       await refresh()
     }catch(e:any){setMsg(e?.message||'Falha ao atualizar a venda.')}finally{setBusy(false)}
+  }
+
+  function openEditValue(sale:any){
+    if(!isAdmin)return
+    setMsg('')
+    setEditingSale(sale)
+    setEditVgv(String(Number(sale.vgv||0)))
+  }
+
+  async function saveSaleValue(){
+    if(!isAdmin||!editingSale)return
+    try{
+      setBusy(true);setMsg('')
+      const vgv=parseMoney(editVgv)
+      if(!Number.isFinite(vgv)||vgv<=0)throw new Error('Informe um valor de venda válido.')
+      const {error}=await supabase
+        .from('sales_submissions')
+        .update({vgv,updated_at:new Date().toISOString()})
+        .eq('id',editingSale.id)
+      if(error)throw error
+
+      setSales(current=>current.map((sale:any)=>sale.id===editingSale.id?{...sale,vgv}:sale))
+      setEditingSale(null)
+      setEditVgv('')
+      setMsg('VALOR DA VENDA ATUALIZADO. VGV, RANKING E METAS FORAM RECALCULADOS.')
+      await refresh()
+    }catch(e:any){
+      setMsg(e?.message||'Não foi possível alterar o valor da venda.')
+    }finally{
+      setBusy(false)
+    }
+  }
+
+
+  async function deleteSale(){
+    if(!isAdmin||!deletingSale)return
+    try{
+      setBusy(true);setMsg('')
+      const {error}=await supabase
+        .from('sales_submissions')
+        .delete()
+        .eq('id',deletingSale.id)
+      if(error)throw error
+
+      setSales(current=>current.filter((sale:any)=>sale.id!==deletingSale.id))
+      setDeletingSale(null)
+      setMsg('VENDA APAGADA DEFINITIVAMENTE. VGV, RANKING E METAS FORAM RECALCULADOS.')
+      await refresh()
+    }catch(e:any){
+      setMsg(e?.message||'Não foi possível apagar a venda.')
+    }finally{
+      setBusy(false)
+    }
   }
 
   const pending=sales.filter((s:any)=>s.approval_status==='pending')
@@ -97,14 +159,57 @@ export default function SalesConsole({viewerId,viewerRole,campaign,executives,in
       <div className="section-head"><h2>Fila de <b>Aprovação</b></h2><div className="line"/><div className="meta">{pending.length} aguardando comando</div></div>
       <div className="approval-grid">{pending.map((sale:any)=><article className="approval-card" key={sale.id}>
         <div className="approval-status">PENDENTE</div><h3>{sale.executive?.full_name||'Executivo'}</h3><strong>{money(sale.vgv)}</strong><p>{sale.development}{sale.unit?` · ${sale.unit}`:''}</p><small>{new Date(sale.sold_at+'T12:00:00').toLocaleDateString('pt-BR')} · {sale.customer_name||'Cliente não informado'}</small>
-        <div className="approval-actions"><button type="button" className="danger-btn" disabled={busy} onClick={()=>decide(sale.id,'rejected')}>Rejeitar</button><button type="button" className="primary-btn" disabled={busy} onClick={()=>decide(sale.id,'approved')}>Aprovar venda</button></div>
+        <div className="approval-actions">
+          {isAdmin&&<button type="button" className="ghost-btn" disabled={busy} onClick={()=>openEditValue(sale)}>Editar valor</button>}
+          {isAdmin&&<button type="button" className="danger-btn" disabled={busy} onClick={()=>setDeletingSale(sale)}>Apagar</button>}
+          <button type="button" className="danger-btn" disabled={busy} onClick={()=>decide(sale.id,'rejected')}>Rejeitar</button>
+          <button type="button" className="primary-btn" disabled={busy} onClick={()=>decide(sale.id,'approved')}>Aprovar venda</button>
+        </div>
       </article>)}</div>
     </section>}
 
     <div className="section-head"><h2>{manager?'Últimos':'Meu'} <b>Registros</b></h2><div className="line"/><div className="meta">histórico da operação</div></div>
-    <div className="panel" style={{padding:0,overflow:'auto'}}><table className="data-table"><thead><tr>{manager&&<th>Executivo</th>}<th>Data</th><th>Empreendimento</th><th>Unidade</th><th>VGV</th><th>Status</th></tr></thead><tbody>
-      {sales.map((s:any)=><tr key={s.id}>{manager&&<td>{s.executive?.full_name||'—'}</td>}<td>{new Date(s.sold_at+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>{s.development}</td><td>{s.unit||'—'}</td><td>{money(s.vgv)}</td><td><span className={`badge ${s.approval_status==='approved'?'green':s.approval_status==='pending'?'amber':'red'}`}>{s.approval_status==='approved'?'Aprovada':s.approval_status==='pending'?'Aguardando':'Rejeitada'}</span></td></tr>)}
-      {!sales.length&&<tr><td colSpan={manager?6:5} style={{textAlign:'center',padding:30,color:'#718078'}}>Nenhuma venda registrada ainda.</td></tr>}
+    <div className="panel" style={{padding:0,overflow:'auto'}}><table className="data-table"><thead><tr>{manager&&<th>Executivo</th>}<th>Data</th><th>Empreendimento</th><th>Unidade</th><th>VGV</th><th>Status</th>{isAdmin&&<th>Ações</th>}</tr></thead><tbody>
+      {sales.map((s:any)=><tr key={s.id}>{manager&&<td>{s.executive?.full_name||'—'}</td>}<td>{new Date(s.sold_at+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>{s.development}</td><td>{s.unit||'—'}</td><td>{money(s.vgv)}</td><td><span className={`badge ${s.approval_status==='approved'?'green':s.approval_status==='pending'?'amber':'red'}`}>{s.approval_status==='approved'?'Aprovada':s.approval_status==='pending'?'Aguardando':'Rejeitada'}</span></td>{isAdmin&&<td><div style={{display:'flex',gap:6,alignItems:'center'}}><button type="button" className="icon-btn" title="Editar valor da venda" onClick={()=>openEditValue(s)}>✎</button><button type="button" className="icon-btn sale-delete-icon" title="Apagar venda" onClick={()=>setDeletingSale(s)}>×</button></div></td>}</tr>)}
+      {!sales.length&&<tr><td colSpan={(manager?6:5)+(isAdmin?1:0)} style={{textAlign:'center',padding:30,color:'#718078'}}>Nenhuma venda registrada ainda.</td></tr>}
     </tbody></table></div>
+
+    {editingSale&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)setEditingSale(null)}}>
+      <div className="modal">
+        <h3>Editar valor da venda</h3>
+        <p className="page-sub">Alteração exclusiva do administrador. Ao salvar, o VGV aprovado, ranking e metas passam a considerar o novo valor.</p>
+        <div className="panel" style={{padding:14,marginTop:14}}>
+          <div className="page-kicker">{editingSale.executive?.full_name||'Executivo'}</div>
+          <div style={{fontFamily:'Barlow Condensed',fontWeight:800,fontSize:24,color:'#fff',textTransform:'uppercase',marginTop:6}}>{editingSale.development}{editingSale.unit?` · ${editingSale.unit}`:''}</div>
+          <div style={{fontSize:12,color:'#7f95ac',marginTop:5}}>Valor atual: {money(editingSale.vgv)}</div>
+        </div>
+        <div className="field">
+          <label>Novo valor da venda / VGV</label>
+          <input autoFocus inputMode="decimal" value={editVgv} onChange={e=>setEditVgv(e.target.value)} placeholder="Ex.: 232900"/>
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="ghost-btn" disabled={busy} onClick={()=>setEditingSale(null)}>Cancelar</button>
+          <button type="button" className="primary-btn" disabled={busy} onClick={saveSaleValue}>{busy?'Salvando...':'Salvar novo valor'}</button>
+        </div>
+      </div>
+    </div>}
+
+    {deletingSale&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)setDeletingSale(null)}}>
+      <div className="modal sale-delete-modal">
+        <div className="sale-delete-warning">AÇÃO IRREVERSÍVEL</div>
+        <h3>Apagar venda?</h3>
+        <p className="page-sub">Esta venda será removida definitivamente da operação. Se estiver aprovada, o valor será retirado imediatamente do VGV, ranking e metas.</p>
+        <div className="panel sale-delete-summary">
+          <div className="page-kicker">{deletingSale.executive?.full_name||'Executivo'}</div>
+          <div className="sale-delete-title">{deletingSale.development}{deletingSale.unit?` · ${deletingSale.unit}`:''}</div>
+          <div className="sale-delete-value">{money(deletingSale.vgv)}</div>
+          <div className="sale-delete-customer">{deletingSale.customer_name||'Cliente não informado'}</div>
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="ghost-btn" disabled={busy} onClick={()=>setDeletingSale(null)}>Cancelar</button>
+          <button type="button" className="danger-btn" disabled={busy} onClick={deleteSale}>{busy?'Apagando...':'Apagar definitivamente'}</button>
+        </div>
+      </div>
+    </div>}
   </div>
 }

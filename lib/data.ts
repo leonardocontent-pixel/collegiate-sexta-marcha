@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { DEFAULT_GOAL_TIERS, normalizeGoalTiers } from '@/lib/goals'
 
 function avatarUrl(supabase:any, path:string|null|undefined){
   return path ? supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl : null
@@ -30,9 +31,14 @@ export async function getDashboardData(){
     getRegisteredExecutives(40),
     supabase.from('sales_submissions').select('id,vgv,approval_status,created_at,approved_at,development,profiles!sales_submissions_executive_id_fkey(full_name)').order('created_at',{ascending:false}).limit(10),
   ])
-  const activeCampaign=campaign||{id:'demo',name:'Operação Sexta Marcha',subtitle:'Disciplina. Estratégia. Execução.',target_vgv:7000000,start_date:'2026-09-01',end_date:'2026-09-30'}
+  const activeCampaign=campaign||{id:'demo',name:'Operação Resultado',subtitle:'Quem executa, vende. Pessoas, processos, vendas e crescimento.',target_vgv:7000000,start_date:'2026-09-01',end_date:'2026-09-30'}
   const safeSummary=summary||{confirmed_vgv:0,pending_vgv:0,total_vgv:0,approved_sales:0,pending_sales:0,active_executives:executives.length}
-  return {campaign:activeCampaign,summary:safeSummary,operators:executives,feed:feed||[]}
+  let goals=normalizeGoalTiers(DEFAULT_GOAL_TIERS)
+  if(campaign?.id){
+    const {data:goalRows,error:goalError}=await supabase.from('goal_tiers').select('*').eq('campaign_id',campaign.id).eq('active',true).order('sort_order')
+    if(!goalError && goalRows?.length) goals=normalizeGoalTiers(goalRows as any)
+  }
+  return {campaign:activeCampaign,summary:safeSummary,operators:executives,feed:feed||[],goals}
 }
 
 export async function getLoadoutProfile(userId:string){

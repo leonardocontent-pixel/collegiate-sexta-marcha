@@ -21,15 +21,15 @@ const REALISTIC_ART:Record<string,{src:string;face:{left:number;top:number;width
 
 const DEFAULT_KIT:Record<string,{outfit:string;headgear:string;weapon:string;accessory:string}> = {
   assault:{outfit:'vanguard',headgear:'helmet',weapon:'carbine',accessory:'flash'},
-  sniper:{outfit:'phantom',headgear:'headset',weapon:'marksman',accessory:'drone'},
-  recon:{outfit:'striker',headgear:'goggles',weapon:'smg',accessory:'drone'},
-  support:{outfit:'sentinel',headgear:'helmet',weapon:'lmg',accessory:'medkit'},
+  sniper:{outfit:'ghillie',headgear:'headset',weapon:'marksman',accessory:'drone'},
+  recon:{outfit:'striker',headgear:'cap',weapon:'smg',accessory:'drone'},
+  support:{outfit:'sentinel',headgear:'bandana',weapon:'lmg',accessory:'medkit'},
   commander:{outfit:'sentinel',headgear:'headset',weapon:'marksman',accessory:'drone'},
 }
 
 const OUTFITS = [
   { key:'vanguard', name:'Vanguard', description:'Colete pesado e presença de linha de frente.' },
-  { key:'phantom', name:'Phantom', description:'Perfil stealth com acabamento escurecido.' },
+  { key:'ghillie', name:'Ghillie', description:'Camuflagem sniper com presença furtiva.' },
   { key:'sentinel', name:'Sentinel', description:'Configuração robusta e utilitária.' },
   { key:'striker', name:'Striker', description:'Visual urbano de incursão rápida.' },
 ]
@@ -38,7 +38,7 @@ const HEADGEARS = [
   { key:'helmet', name:'Capacete', description:'Proteção tática padrão' },
   { key:'cap', name:'Boné', description:'Perfil leve de campo' },
   { key:'headset', name:'Headset', description:'Comunicação avançada' },
-  { key:'goggles', name:'Óculos', description:'Reconhecimento e incursão' },
+  { key:'bandana', name:'Bandana', description:'Perfil leve com identidade de suporte' },
 ]
 
 const WEAPONS = [
@@ -73,7 +73,7 @@ const OUTPUT_SIZE = 640
 const OUTPUT_SHIFT_RATIO = OUTPUT_SIZE / 300
 const ART_WIDTH = 1086
 const ART_HEIGHT = 1448
-const MVP_CROP_HEIGHT = 860
+const MVP_CROP_HEIGHT = 900
 
 function readCustomState(initialProfile:any, teams:any[]) {
   const crop = initialProfile?.avatar_crop && typeof initialProfile.avatar_crop === 'object' ? initialProfile.avatar_crop : {}
@@ -251,7 +251,7 @@ export default function LoadoutConfigurator({ userId, initialProfile, dbLoadouts
       const payload={
         selected_loadout:selected,
         avatar_path:avatarPath,
-        avatar_crop:{...normalizedFace,codename,squadId,squadName,outfit,headgear,weapon,accessory,bgScene,renderCardPath,renderMvpPath,renderVersion:3},
+        avatar_crop:{...normalizedFace,codename,squadId,squadName,outfit,headgear,weapon,accessory,bgScene,renderCardPath,renderMvpPath,renderVersion:2},
         updated_at:new Date().toISOString(),
       }
       const {error}=await supabase.from('profiles').update(payload).eq('id',userId)

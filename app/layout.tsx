@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Collegiate Vendas — Operação Sexta Marcha',
-  description: 'Dashboard comercial tático da Collegiate Vendas',
+  title: 'Menfe — Operação Resultado',
+  description: 'Dashboard comercial tático da Menfe — Operação Resultado',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
