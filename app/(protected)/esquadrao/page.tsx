@@ -1,14 +1,15 @@
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { brl } from '@/lib/format'
+import { getOperatorRoster } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
 export default async function SquadPage({ searchParams }: { searchParams: Promise<{ team?: string }> }) {
   const params = await searchParams
   const supabase = await createClient()
-  const [{ data: operators }, { data: teams }] = await Promise.all([
-    supabase.from('operator_performance').select('*').order('vgv', { ascending:false }),
+  const [operators, { data: teams }] = await Promise.all([
+    getOperatorRoster(),
     supabase.from('teams').select('id,name,slug').eq('active', true).order('name'),
   ])
   const filtered = (operators || []).filter((o:any) => !params.team || o.team_name === params.team)
@@ -25,7 +26,7 @@ export default async function SquadPage({ searchParams }: { searchParams: Promis
 
     <div className="squad-grid">
       {filtered.map((op:any,index:number)=>{
-        const avatar=op.avatar_path ? supabase.storage.from('avatars').getPublicUrl(op.avatar_path).data.publicUrl : `/assets/operator-${(index%6)+1}.webp`
+        const avatar=op.avatar_url || `/assets/operator-${(index%6)+1}.webp`
         return <article className="operator-card" key={op.id}>
           <div className="operator-img"><Image src={avatar} fill sizes="25vw" alt={op.full_name}/><div className="operator-rank">P{String(index+1).padStart(2,'0')}</div><div className="operator-online"/></div>
           <div className="operator-body"><div className="operator-call">{op.codename}</div><div className="operator-name">{op.full_name}</div><div className="operator-role">{op.title} · {op.team_name || 'SEM TIME'}</div><div className="operator-stats"><div><strong>{brl(op.vgv)}</strong><small>VGV</small></div><div><strong>{op.sales_count}</strong><small>vendas</small></div></div></div>
