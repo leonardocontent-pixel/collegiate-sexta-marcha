@@ -1,3 +1,4 @@
+import styles from './gestao-font-fix.module.css'
 import ManagementPanel from '@/components/management-panel'
 import OperationSettingsPanel from '@/components/operation-settings-panel'
 import SalesConsole from '@/components/sales-console'
@@ -21,22 +22,15 @@ export default async function ManagementPage() {
   ])
 
   const list = profiles || []
-  let goalRows = normalizeGoalTiers(DEFAULT_GOAL_TIERS)
+  const vgvKeys = ['meta_vgv','super_vgv','hiper_vgv','suprema_vgv'] as const
+  const rewardKeys = ['meta_reward','super_reward','hiper_reward','suprema_reward'] as const
+  const goalRows = normalizeGoalTiers(DEFAULT_GOAL_TIERS.map((goal,index)=>({
+    ...goal,
+    threshold_vgv:Number((campaign as any)?.[vgvKeys[index]] ?? goal.threshold_vgv),
+    reward:String((campaign as any)?.[rewardKeys[index]] ?? goal.reward),
+  })))
 
-  if (campaign?.id) {
-    const { data: goals, error } = await supabase
-      .from('goal_tiers')
-      .select('*')
-      .eq('campaign_id', campaign.id)
-      .eq('active', true)
-      .order('sort_order')
-
-    if (!error && goals?.length) {
-      goalRows = normalizeGoalTiers(goals as any)
-    }
-  }
-
-  return <div className="content max">
+  return <div className={`content max ${styles.gestaoRoot}`}>
     <div className="page-kicker">COMANDO // VENDAS, APROVAÇÕES, METAS E ACESSOS</div>
     <h1 className="page-title">Gestão</h1>
     <p className="page-sub">
@@ -45,49 +39,17 @@ export default async function ManagementPage() {
     </p>
 
     <div className="metric-grid">
-      <div className="metric">
-        <div className="label">Executivos ativos</div>
-        <div className="value">{list.filter((p: any) => p.active && p.role === 'executive').length}</div>
-      </div>
-      <div className="metric">
-        <div className="label">Aguardando aprovação</div>
-        <div className="value">{summary?.pending_sales || 0}</div>
-      </div>
-      <div className="metric">
-        <div className="label">VGV aprovado</div>
-        <div className="value">{brl(summary?.confirmed_vgv || 0)}</div>
-      </div>
-      <div className="metric">
-        <div className="label">Vendas aprovadas</div>
-        <div className="value">{summary?.approved_sales || 0}</div>
-      </div>
+      <div className="metric"><div className="label">Executivos ativos</div><div className="value">{list.filter((p: any) => p.active && p.role === 'executive').length}</div></div>
+      <div className="metric"><div className="label">Aguardando aprovação</div><div className="value">{summary?.pending_sales || 0}</div></div>
+      <div className="metric"><div className="label">VGV aprovado</div><div className="value">{brl(summary?.confirmed_vgv || 0)}</div></div>
+      <div className="metric"><div className="label">Vendas aprovadas</div><div className="value">{summary?.approved_sales || 0}</div></div>
     </div>
 
-    <OperationSettingsPanel
-      initialCampaign={campaign as any}
-      initialGoals={goalRows as any}
-      viewerRole={viewer.profile.role}
-    />
+    <OperationSettingsPanel initialCampaign={campaign as any} initialGoals={goalRows as any} viewerRole={viewer.profile.role} />
 
-    <SalesConsole
-      viewerId={viewer.id}
-      viewerRole={viewer.profile.role}
-      campaign={salesData.campaign}
-      executives={salesData.executives}
-      initialSales={salesData.sales}
-      compact
-    />
+    <SalesConsole viewerId={viewer.id} viewerRole={viewer.profile.role} campaign={salesData.campaign} executives={salesData.executives} initialSales={salesData.sales} compact />
 
-    <div className="section-head">
-      <h2>Usuários e <b>Acessos</b></h2>
-      <div className="line" />
-      <div className="meta">{viewer.profile.role === 'admin' ? 'edição liberada' : 'somente leitura'}</div>
-    </div>
-
-    <ManagementPanel
-      initialProfiles={list as any}
-      teams={teams || []}
-      viewerRole={viewer.profile.role}
-    />
+    <div className="section-head"><h2>Usuários e <b>Acessos</b></h2><div className="line"/><div className="meta">{viewer.profile.role === 'admin' ? 'edição liberada' : 'somente leitura'}</div></div>
+    <ManagementPanel initialProfiles={list as any} teams={teams || []} viewerRole={viewer.profile.role} />
   </div>
 }

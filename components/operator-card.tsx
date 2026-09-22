@@ -13,9 +13,10 @@ const BG_SCENES:Record<string,string> = {
 }
 
 const SALES_BADGES=[
-  { threshold:3, label:'Multikill', src:'/assets/sales-badge-3.png' },
-  { threshold:5, label:'Rampage', src:'/assets/sales-badge-5.png' },
-  { threshold:10, label:'Domination', src:'/assets/sales-badge-10.png' },
+  { threshold:1, label:'First Blood', src:'/assets/sales-badge-first-blood.png', helper:'1ª venda' },
+  { threshold:3, label:'Multikill', src:'/assets/sales-badge-3.png', helper:'3 vendas' },
+  { threshold:5, label:'Rampage', src:'/assets/sales-badge-5.png', helper:'5 vendas' },
+  { threshold:10, label:'Domination', src:'/assets/sales-badge-10.png', helper:'10 vendas' },
 ]
 
 export function loadoutConfig(op:any){
@@ -75,12 +76,12 @@ export function SalesMarks({salesCount,compact=false}:{salesCount:number;compact
       {total===0 && <span className="sales-skull-empty">sem marcas</span>}
       {total>12 && <span className="sales-skull-extra">+{total-12}</span>}
     </div>
-    <div className="sales-badge-row">
+    <div className="sales-badge-row" style={{gridTemplateColumns:"repeat(4,minmax(0,1fr))"}}>
       {SALES_BADGES.map((badge)=><div key={badge.threshold} className={`sales-badge-chip ${total>=badge.threshold?'active':'locked'}`}>
         <img src={badge.src} alt={badge.label} />
         <div>
           <strong>{badge.label}</strong>
-          <small>{badge.threshold} vendas</small>
+          <small>{badge.helper}</small>
         </div>
       </div>)}
     </div>

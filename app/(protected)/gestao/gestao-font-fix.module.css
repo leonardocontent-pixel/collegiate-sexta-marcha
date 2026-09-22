@@ -1,0 +1,127 @@
+.gestaoRoot {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Hierarquia principal */
+.gestaoRoot :global(.page-title),
+.gestaoRoot :global(.section-head h2),
+.gestaoRoot :global(.operation-admin-head h3),
+.gestaoRoot :global(.sales-command-head h2),
+.gestaoRoot :global(.approval-card h3),
+.gestaoRoot :global(.modal h3) {
+  font-family: "Barlow Condensed", Arial Narrow, sans-serif !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+}
+
+.gestaoRoot :global(.page-title) {
+  letter-spacing: .01em;
+}
+
+.gestaoRoot :global(.operation-admin-head h3) {
+  font-size: 28px !important;
+  line-height: 1 !important;
+  letter-spacing: .015em;
+}
+
+.gestaoRoot :global(.sales-command-head h2) {
+  font-size: 30px !important;
+  line-height: 1 !important;
+  letter-spacing: .015em;
+  margin: 7px 0 4px;
+  color: #fff;
+}
+
+/* Kicker, labels técnicos e metadados */
+.gestaoRoot :global(.page-kicker),
+.gestaoRoot :global(.section-head .meta),
+.gestaoRoot :global(.metric .label),
+.gestaoRoot :global(.field label),
+.gestaoRoot :global(.goal-admin-index),
+.gestaoRoot :global(.goal-admin-badge),
+.gestaoRoot :global(.data-table th),
+.gestaoRoot :global(.sales-kpis span),
+.gestaoRoot :global(.approval-status),
+.gestaoRoot :global(.approval-note),
+.gestaoRoot :global(.badge) {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+}
+
+.gestaoRoot :global(.field label) {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  letter-spacing: .15em !important;
+  text-transform: uppercase;
+  color: #8ca0b2;
+}
+
+/* Inputs de configuração: estava misturando a fonte do body/browser */
+.gestaoRoot :global(.operation-admin-panel .field input),
+.gestaoRoot :global(.operation-admin-panel .field select),
+.gestaoRoot :global(.sales-console .field input),
+.gestaoRoot :global(.sales-console .field select),
+.gestaoRoot :global(.modal .field input),
+.gestaoRoot :global(.modal .field select) {
+  font-family: "Barlow Condensed", Arial Narrow, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .025em !important;
+  text-transform: uppercase;
+  color: #f3f8fc;
+}
+
+/* Evita que datas/números caiam em fonte nativa diferente */
+.gestaoRoot :global(input[type="date"]),
+.gestaoRoot :global(input[type="number"]) {
+  font-family: "Barlow Condensed", Arial Narrow, sans-serif !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botões */
+.gestaoRoot :global(.primary-btn),
+.gestaoRoot :global(.ghost-btn),
+.gestaoRoot :global(.danger-btn),
+.gestaoRoot :global(.icon-btn) {
+  font-family: "Barlow Condensed", Arial Narrow, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em;
+}
+
+/* Métricas */
+.gestaoRoot :global(.metric .value),
+.gestaoRoot :global(.sales-kpis strong),
+.gestaoRoot :global(.approval-card > strong) {
+  font-family: "Barlow Condensed", Arial Narrow, sans-serif !important;
+  font-weight: 800 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Textos corridos ficam em Inter */
+.gestaoRoot :global(.page-sub),
+.gestaoRoot :global(.operation-admin-head p),
+.gestaoRoot :global(.sales-command-head p),
+.gestaoRoot :global(.data-table td),
+.gestaoRoot :global(.form-msg) {
+  font-family: Inter, system-ui, sans-serif !important;
+}
+
+/* Tabela: mantém leitura limpa e não deixa o Barlow invadir */
+.gestaoRoot :global(.data-table td) {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* Valores de badges/perfis continuam técnicos */
+.gestaoRoot :global(.data-table .badge) {
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: .07em !important;
+}
+
+/* Select options também recebem uma fonte previsível */
+.gestaoRoot :global(select option) {
+  font-family: Arial, sans-serif;
+  text-transform: none;
+}

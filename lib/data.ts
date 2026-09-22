@@ -5,6 +5,18 @@ function avatarUrl(supabase:any, path:string|null|undefined){
   return path ? supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl : null
 }
 
+function goalsFromCampaign(campaign:any){
+  return normalizeGoalTiers(DEFAULT_GOAL_TIERS.map((base,index)=>{
+    const vgvKeys=['meta_vgv','super_vgv','hiper_vgv','suprema_vgv']
+    const rewardKeys=['meta_reward','super_reward','hiper_reward','suprema_reward']
+    return {
+      ...base,
+      threshold_vgv:Number(campaign?.[vgvKeys[index]] ?? base.threshold_vgv),
+      reward:String(campaign?.[rewardKeys[index]] ?? base.reward),
+    }
+  }))
+}
+
 export async function getRegisteredExecutives(limit?:number){
   const supabase=await createClient()
   let query=supabase.from('executive_performance').select('*').order('vgv',{ascending:false}).order('full_name',{ascending:true})
@@ -23,22 +35,33 @@ export async function getRegisteredExecutives(limit?:number){
   })
 }
 
-export async function getDashboardData(){
+export async function getDashboardData(viewerId?:string){
   const supabase=await createClient()
   const [{data:campaign},{data:summary},executives,{data:feed}]=await Promise.all([
     supabase.from('campaigns').select('*').eq('active',true).order('start_date',{ascending:false}).limit(1).maybeSingle(),
     supabase.from('operation_summary').select('*').limit(1).maybeSingle(),
     getRegisteredExecutives(40),
-    supabase.from('sales_submissions').select('id,vgv,approval_status,created_at,approved_at,development,profiles!sales_submissions_executive_id_fkey(full_name)').order('created_at',{ascending:false}).limit(10),
+    supabase.from('sales_submissions').select('id,vgv,approval_status,created_at,approved_at,development,customer_name,profiles!sales_submissions_executive_id_fkey(full_name)').order('created_at',{ascending:false}).limit(10),
   ])
+
   const activeCampaign=campaign||{id:'demo',name:'Operação Resultado',subtitle:'Quem executa, vende. Pessoas, processos, vendas e crescimento.',target_vgv:7000000,start_date:'2026-09-01',end_date:'2026-09-30'}
   const safeSummary=summary||{confirmed_vgv:0,pending_vgv:0,total_vgv:0,approved_sales:0,pending_sales:0,active_executives:executives.length}
-  let goals=normalizeGoalTiers(DEFAULT_GOAL_TIERS)
-  if(campaign?.id){
-    const {data:goalRows,error:goalError}=await supabase.from('goal_tiers').select('*').eq('campaign_id',campaign.id).eq('active',true).order('sort_order')
-    if(!goalError && goalRows?.length) goals=normalizeGoalTiers(goalRows as any)
+  const goals=goalsFromCampaign(activeCampaign)
+
+  const viewerReward={viewerId:viewerId||null,approvedSales:0,firstBloodUnlocked:false}
+  if(viewerId){
+    const {count,error}=await supabase
+      .from('sales_submissions')
+      .select('id',{count:'exact',head:true})
+      .eq('executive_id',viewerId)
+      .eq('approval_status','approved')
+    if(!error){
+      viewerReward.approvedSales=Number(count||0)
+      viewerReward.firstBloodUnlocked=Number(count||0)===1
+    }
   }
-  return {campaign:activeCampaign,summary:safeSummary,operators:executives,feed:feed||[],goals}
+
+  return {campaign:activeCampaign,summary:safeSummary,operators:executives,feed:feed||[],goals,viewerReward}
 }
 
 export async function getLoadoutProfile(userId:string){

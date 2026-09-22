@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { BADGE_LABELS, DEFAULT_GOAL_TIERS, normalizeGoalTiers } from '@/lib/goals'
+import { DEFAULT_GOAL_TIERS, normalizeGoalTiers } from '@/lib/goals'
 
 type Campaign = {
   id: string
@@ -12,11 +12,17 @@ type Campaign = {
   start_date: string
   end_date: string
   active: boolean
+  meta_vgv?: number
+  super_vgv?: number
+  hiper_vgv?: number
+  suprema_vgv?: number
+  meta_reward?: string
+  super_reward?: string
+  hiper_reward?: string
+  suprema_reward?: string
 }
 
 type GoalTier = {
-  id?: string
-  campaign_id?: string
   name: string
   threshold_vgv: number
   reward: string
@@ -27,7 +33,12 @@ type GoalTier = {
   active?: boolean
 }
 
-const badgeOptions = Object.entries(BADGE_LABELS)
+const columnMap = [
+  { vgv: 'meta_vgv', reward: 'meta_reward' },
+  { vgv: 'super_vgv', reward: 'super_reward' },
+  { vgv: 'hiper_vgv', reward: 'hiper_reward' },
+  { vgv: 'suprema_vgv', reward: 'suprema_reward' },
+] as const
 
 export default function OperationSettingsPanel({
   initialCampaign,
@@ -45,12 +56,12 @@ export default function OperationSettingsPanel({
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
 
-  function setGoalValue(index: number, field: keyof GoalTier, value: string) {
+  function setGoalValue(index: number, field: 'threshold_vgv' | 'reward', value: string) {
     setGoals((current) => current.map((goal, i) => {
       if (i !== index) return goal
       return {
         ...goal,
-        [field]: field === 'threshold_vgv' || field === 'sort_order' ? Number(value || 0) : value,
+        [field]: field === 'threshold_vgv' ? Number(value || 0) : value,
       }
     }))
   }
@@ -83,27 +94,38 @@ export default function OperationSettingsPanel({
     try {
       setBusy(true)
       setMsg('')
-      const payload = goals.map((goal, index) => ({
-        id: goal.id,
-        campaign_id: campaign.id,
-        name: goal.name.trim() || `Objetivo ${index + 1}`,
-        threshold_vgv: Number(goal.threshold_vgv || 0),
-        reward: goal.reward.trim() || 'Premiação a definir',
-        weapon: goal.weapon.trim() || 'Arsenal a definir',
-        code: goal.code.trim() || 'Op',
-        badge_key: goal.badge_key || DEFAULT_GOAL_TIERS[index]?.badge_key || 'meta_grenade',
-        sort_order: index + 1,
-        active: true,
-        updated_at: new Date().toISOString(),
-      }))
+
+      const payload: Record<string, number | string> = {}
+      goals.slice(0, 4).forEach((goal, index) => {
+        const cols = columnMap[index]
+        if (!cols) return
+        payload[cols.vgv] = Number(goal.threshold_vgv || 0)
+        payload[cols.reward] = String(goal.reward || '').trim()
+      })
+
       const { data, error } = await supabase
-        .from('goal_tiers')
-        .upsert(payload, { onConflict: 'campaign_id,sort_order' })
+        .from('campaigns')
+        .update(payload)
+        .eq('id', campaign.id)
         .select('*')
-        .order('sort_order')
+        .single()
+
       if (error) throw error
-      if (data?.length) setGoals(normalizeGoalTiers(data) as GoalTier[])
-      setMsg('METAS E PREMIAÇÕES ATUALIZADAS COM SUCESSO.')
+
+      if (data) {
+        setCampaign(data as Campaign)
+        const nextGoals = DEFAULT_GOAL_TIERS.map((base, index) => {
+          const cols = columnMap[index]
+          return {
+            ...base,
+            threshold_vgv: Number((data as any)[cols.vgv] ?? base.threshold_vgv),
+            reward: String((data as any)[cols.reward] ?? base.reward),
+          }
+        })
+        setGoals(normalizeGoalTiers(nextGoals) as GoalTier[])
+      }
+
+      setMsg('METAS E PREMIAÇÕES ATUALIZADAS. A HOME PASSA A USAR ESTES VALORES.')
     } catch (error: any) {
       setMsg(error.message || 'Falha ao salvar metas e premiações.')
     } finally {
@@ -127,7 +149,7 @@ export default function OperationSettingsPanel({
             <div>
               <div className="page-kicker">META GERAL DA OPERAÇÃO</div>
               <h3>Operação ativa</h3>
-              <p className="page-sub">Defina o nome, subtítulo e a meta principal usada na barra geral da home.</p>
+              <p className="page-sub">Defina o nome, subtítulo e a meta principal usada na barra geral da Home.</p>
             </div>
             {isAdmin && (
               <button className="primary-btn" disabled={busy || !campaign}>
@@ -165,7 +187,7 @@ export default function OperationSettingsPanel({
             <div>
               <div className="page-kicker">OBJETIVOS SECUNDÁRIOS</div>
               <h3>Insígnias e premiações</h3>
-              <p className="page-sub">Altere meta, nome, arsenal, texto da premiação e o tipo de insígnia de cada objetivo.</p>
+              <p className="page-sub">Altere os valores de VGV e as premiações. A Home lê estes mesmos dados diretamente da campanha ativa.</p>
             </div>
             {isAdmin && (
               <button type="button" className="primary-btn" disabled={busy || !campaign} onClick={saveGoals}>
@@ -175,15 +197,11 @@ export default function OperationSettingsPanel({
           </div>
 
           <div className="goal-admin-grid">
-            {goals.map((goal, index) => (
-              <div key={goal.id || index} className="goal-admin-card">
+            {goals.slice(0, 4).map((goal, index) => (
+              <div key={index} className="goal-admin-card">
                 <div className="goal-admin-card-top">
                   <span className="goal-admin-index">OBJ {index + 1}</span>
-                  <span className="goal-admin-badge">{BADGE_LABELS[goal.badge_key] || 'Insígnia'}</span>
-                </div>
-                <div className="field">
-                  <label>Nome da meta</label>
-                  <input value={goal.name} disabled={!isAdmin || !campaign} onChange={(e) => setGoalValue(index, 'name', e.target.value)} />
+                  <span className="goal-admin-badge">{goal.name}</span>
                 </div>
                 <div className="field">
                   <label>Meta (VGV)</label>
@@ -196,20 +214,12 @@ export default function OperationSettingsPanel({
                 <div className="admin-config-grid compact">
                   <div className="field">
                     <label>Código</label>
-                    <input value={goal.code} disabled={!isAdmin || !campaign} onChange={(e) => setGoalValue(index, 'code', e.target.value)} />
+                    <input value={goal.code} disabled />
                   </div>
                   <div className="field">
                     <label>Arsenal</label>
-                    <input value={goal.weapon} disabled={!isAdmin || !campaign} onChange={(e) => setGoalValue(index, 'weapon', e.target.value)} />
+                    <input value={goal.weapon} disabled />
                   </div>
-                </div>
-                <div className="field">
-                  <label>Tipo de insígnia</label>
-                  <select value={goal.badge_key} disabled={!isAdmin || !campaign} onChange={(e) => setGoalValue(index, 'badge_key', e.target.value)}>
-                    {badgeOptions.map(([value, label]) => (
-                      <option key={value} value={value}>{label}</option>
-                    ))}
-                  </select>
                 </div>
               </div>
             ))}

@@ -1,0 +1,332 @@
+
+/* Refinamento dos 3 degraus: Meta / Super / Hiper */
+.threeGoalGrid{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:14px !important;
+  align-items:stretch;
+}
+.goalCard{
+  display:grid !important;
+  grid-template-columns:138px minmax(0,1fr) !important;
+  gap:18px !important;
+  align-items:center !important;
+  min-height:330px !important;
+  padding:22px 24px !important;
+  overflow:hidden;
+}
+.goalInsignia{
+  width:138px !important;
+  min-width:138px !important;
+  height:138px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  align-self:center !important;
+  margin:0 !important;
+  background:radial-gradient(circle,rgba(69,200,255,.08),transparent 67%);
+}
+.goalInsignia img{
+  width:118px !important;
+  height:118px !important;
+  object-fit:contain !important;
+  filter:drop-shadow(0 12px 24px rgba(0,0,0,.38));
+}
+.goalCopy{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-self:stretch;
+}
+.goalCopy :global(.level-name){
+  font-size:31px !important;
+  line-height:.95 !important;
+  margin-bottom:2px !important;
+}
+.goalCopy :global(.level-weapon){
+  margin-top:11px !important;
+  font-size:8px !important;
+  letter-spacing:.11em !important;
+}
+.goalCopy :global(.level-status){
+  margin-top:8px !important;
+}
+
+.bonusPanel{
+  display:grid;
+  grid-template-columns:190px minmax(0,1fr) 320px;
+  gap:22px;
+  align-items:center;
+  margin-top:18px;
+  padding:20px;
+  border:1px solid rgba(69,200,255,.24);
+  background:linear-gradient(135deg,rgba(8,18,31,.96),rgba(6,12,20,.98));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 18px 50px rgba(0,0,0,.18);
+}
+.badgeWrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:150px;
+  background:radial-gradient(circle,rgba(69,200,255,.10),transparent 65%);
+}
+.badgeWrap img{
+  width:150px;
+  height:150px;
+  object-fit:contain;
+  filter:drop-shadow(0 12px 24px rgba(0,0,0,.34));
+}
+.copy .kicker{
+  font:700 9px 'JetBrains Mono';
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#63d3ff;
+}
+.copy h3{
+  margin:7px 0 8px;
+  font:900 34px 'Barlow Condensed';
+  text-transform:uppercase;
+  color:#fff;
+}
+.copy p{
+  margin:0;
+  max-width:760px;
+  color:#9fb2c1;
+  font-size:13px;
+  line-height:1.55;
+}
+.copy strong{
+  color:#fff;
+}
+.metrics{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+.metric{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.025);
+  padding:14px;
+}
+.metric span{
+  display:block;
+  font:700 8px 'JetBrains Mono';
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#7f95a6;
+}
+.metric b{
+  display:block;
+  margin-top:5px;
+  font:900 30px 'Barlow Condensed';
+  color:#fff;
+}
+.metricAccent b{
+  color:#65dcff;
+}
+.cumulativeNote{
+  margin-top:8px;
+  font:700 9px 'JetBrains Mono';
+  letter-spacing:.10em;
+  text-transform:uppercase;
+  color:#b7c8d4;
+}
+@media(max-width:1380px){
+  .threeGoalGrid{grid-template-columns:1fr !important}
+  .bonusPanel{grid-template-columns:150px 1fr}
+  .metrics{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:900px){
+  .bonusPanel{grid-template-columns:1fr;text-align:center}
+  .metrics{grid-template-columns:1fr}
+}
+
+/* Meta cards: premiações em linhas + progresso individual */
+.goalTarget{
+  margin-top:3px;
+  font:900 23px 'Barlow Condensed';
+  letter-spacing:.02em;
+  color:#fff;
+}
+.rewardList{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:10px;
+  padding:10px 0 2px;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.rewardLine{
+  display:grid;
+  grid-template-columns:13px 1fr;
+  gap:7px;
+  align-items:start;
+  min-height:20px;
+  color:#d7e6ef;
+  font:700 12px/1.35 'Barlow Condensed';
+  letter-spacing:.01em;
+}
+.rewardBullet{
+  color:#62d8ff;
+  font-size:8px;
+  line-height:18px;
+  filter:drop-shadow(0 0 5px rgba(69,200,255,.35));
+}
+.goalProgress{
+  margin-top:13px;
+  padding-top:10px;
+  border-top:1px solid rgba(69,200,255,.12);
+}
+.goalProgressHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:7px;
+  color:#8fa7b8;
+  font:700 8px 'JetBrains Mono';
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+.goalProgressHead strong{
+  color:#dff8ff;
+  font-size:9px;
+}
+.goalProgressTrack{
+  position:relative;
+  width:100%;
+  height:10px;
+  overflow:hidden;
+  border:1px solid rgba(69,200,255,.24);
+  background:rgba(3,10,16,.92);
+  box-shadow:inset 0 0 12px rgba(0,0,0,.35);
+}
+.goalProgressTrack::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 10px,transparent 10px 20px);
+  pointer-events:none;
+}
+.goalProgressFill{
+  position:relative;
+  height:100%;
+  min-width:0;
+  background:linear-gradient(90deg,#0c5685 0%,#1ea3ff 46%,#65dcff 100%);
+  background-size:200% 100%;
+  box-shadow:0 0 16px rgba(69,200,255,.28);
+  transition:width .8s cubic-bezier(.2,.9,.2,1);
+  animation:goalShine 2.5s linear infinite;
+}
+.goalProgressFill::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.12) 0 7px,transparent 7px 14px);
+}
+.goalProgressDone{
+  background:linear-gradient(90deg,#167693 0%,#58d9ff 50%,#c7fbff 100%);
+}
+.goalProgressValues{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:5px;
+  color:#61798b;
+  font:600 7px 'JetBrains Mono';
+  letter-spacing:.05em;
+}
+@keyframes goalShine{
+  from{background-position:0 0}
+  to{background-position:200% 0}
+}
+
+
+/* Melhor leitura dentro de cada box */
+.goalTarget{
+  margin-top:5px;
+  font-size:27px;
+  line-height:1;
+}
+.rewardList{
+  gap:7px;
+  margin-top:12px;
+  padding:12px 0 4px;
+}
+.rewardLine{
+  min-height:0;
+  grid-template-columns:11px minmax(0,1fr);
+  gap:8px;
+  padding:2px 0;
+  font-size:13px;
+  line-height:1.28;
+}
+.rewardBullet{
+  line-height:16px;
+}
+.goalProgress{
+  margin-top:auto;
+  padding-top:13px;
+}
+.goalProgressHead{
+  margin-bottom:8px;
+}
+.goalProgressTrack{
+  height:11px;
+}
+.goalProgressValues{
+  margin-top:6px;
+}
+
+@media(max-width:1500px){
+  .goalCard{
+    grid-template-columns:112px minmax(0,1fr) !important;
+    gap:14px !important;
+    padding:18px !important;
+    min-height:315px !important;
+  }
+  .goalInsignia{
+    width:112px !important;
+    min-width:112px !important;
+    height:112px !important;
+  }
+  .goalInsignia img{
+    width:98px !important;
+    height:98px !important;
+  }
+  .goalCopy :global(.level-name){font-size:27px !important}
+  .goalTarget{font-size:24px}
+  .rewardLine{font-size:12px}
+}
+@media(max-width:1180px){
+  .threeGoalGrid{grid-template-columns:1fr !important}
+  .goalCard{
+    grid-template-columns:140px minmax(0,1fr) !important;
+    min-height:280px !important;
+  }
+  .goalInsignia{
+    width:140px !important;
+    min-width:140px !important;
+    height:140px !important;
+  }
+  .goalInsignia img{
+    width:118px !important;
+    height:118px !important;
+  }
+}
+@media(max-width:680px){
+  .goalCard{
+    grid-template-columns:1fr !important;
+    text-align:left;
+  }
+  .goalInsignia{
+    width:110px !important;
+    min-width:110px !important;
+    height:110px !important;
+    justify-self:start;
+  }
+  .goalInsignia img{
+    width:94px !important;
+    height:94px !important;
+  }
+}
