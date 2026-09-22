@@ -1,0 +1,135 @@
+/* Ajustes exclusivos do TOP 3 para evitar sobreposição entre rank, nome e micro goals */
+.mvpCard,
+.podiumCard{
+  min-height:470px !important;
+}
+
+.mvpCopy{
+  left:24px !important;
+  right:auto !important;
+  bottom:18px !important;
+  width:58% !important;
+  max-width:58% !important;
+}
+
+.mvpCopy :global(.mvp-squad){
+  display:block;
+  margin-bottom:3px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mvpCopy :global(h3){
+  margin:2px 0 1px !important;
+  font-size:38px !important;
+  line-height:.92 !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mvpCopy > :global(strong){
+  display:block;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.mvpCopy :global(.mvp-vgv){
+  margin-top:5px !important;
+  line-height:1 !important;
+}
+.mvpCopy :global(.mvp-sales){
+  margin-top:1px;
+}
+.mvpCopy :global(.sales-marks){
+  width:100% !important;
+  max-width:none !important;
+  margin-top:8px !important;
+  padding:9px 10px 10px !important;
+}
+
+.podiumCopy{
+  left:18px !important;
+  right:18px !important;
+  bottom:16px !important;
+  width:auto !important;
+  max-width:none !important;
+}
+.podiumCopy > :global(span){
+  display:block;
+  padding-right:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.podiumCopy :global(h3){
+  margin:2px 0 1px !important;
+  font-size:28px !important;
+  line-height:.92 !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.podiumCopy > :global(strong){
+  display:block;
+  max-width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:13px !important;
+}
+.podiumCopy > :global(b){
+  margin-top:4px !important;
+  font-size:27px !important;
+  line-height:1 !important;
+}
+.podiumCopy > :global(small){
+  margin-top:1px;
+}
+.podiumCopy :global(.sales-marks){
+  width:100% !important;
+  max-width:none !important;
+  margin-top:7px !important;
+  padding:8px 8px 9px !important;
+}
+.podiumCopy :global(.sales-marks-head){
+  gap:6px;
+}
+.podiumCopy :global(.sales-marks-head span),
+.podiumCopy :global(.sales-marks-head b){
+  font-size:7px !important;
+}
+.podiumCopy :global(.sales-skull-row){
+  margin-top:5px !important;
+  min-height:12px !important;
+}
+.podiumCopy :global(.sales-skull-icon){
+  width:13px !important;
+  height:13px !important;
+}
+
+.mvpCard :global(.mvp-rank),
+.podiumCard :global(.podium-rank){
+  top:14px !important;
+  left:16px !important;
+  line-height:.85 !important;
+  z-index:7 !important;
+}
+
+@media(max-width:1500px){
+  .mvpCopy{width:62% !important;max-width:62% !important;left:20px !important}
+  .mvpCopy :global(h3){font-size:34px !important}
+  .podiumCopy{left:14px !important;right:14px !important}
+  .podiumCopy :global(h3){font-size:25px !important}
+  .podiumCopy > :global(strong){font-size:12px !important}
+}
+
+@media(max-width:1100px){
+  .mvpCopy{width:auto !important;max-width:none !important;right:20px !important}
+  .podiumCopy{left:18px !important;right:18px !important}
+}
+
+@media(max-width:900px){
+  .mvpCard,.podiumCard{min-height:460px !important}
+  .mvpCopy,.podiumCopy{left:18px !important;right:18px !important;width:auto !important;max-width:none !important}
+}

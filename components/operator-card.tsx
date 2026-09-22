@@ -1,3 +1,5 @@
+import styles from './operator-sales-goals.module.css'
+
 const LOADOUT_ART:Record<string,{src:string;face:{left:number;top:number;width:number;height:number};label:string}> = {
   assault:{src:'/assets/loadout-assault.webp',face:{left:36.65,top:13.60,width:25.23,height:17.82},label:'Breacher'},
   sniper:{src:'/assets/loadout-precision.webp',face:{left:39.13,top:12.71,width:21.64,height:15.19},label:'Marksman'},
@@ -63,7 +65,7 @@ export function OperatorScene({op,variant='card'}:{op:any;variant?:'mvp'|'podium
   </div>
 }
 
-export function SalesMarks({salesCount,compact=false}:{salesCount:number;compact?:boolean}){
+export function SalesMarks({salesCount,compact=false,layout='card'}:{salesCount:number;compact?:boolean;layout?:'card'|'mvp'|'podium'}){
   const total=Math.max(0, Number(salesCount||0))
   const visible=Math.min(total,12)
   return <div className={`sales-marks ${compact?'compact':''}`}>
@@ -76,14 +78,19 @@ export function SalesMarks({salesCount,compact=false}:{salesCount:number;compact
       {total===0 && <span className="sales-skull-empty">sem marcas</span>}
       {total>12 && <span className="sales-skull-extra">+{total-12}</span>}
     </div>
-    <div className="sales-badge-row" style={{gridTemplateColumns:"repeat(4,minmax(0,1fr))"}}>
-      {SALES_BADGES.map((badge)=><div key={badge.threshold} className={`sales-badge-chip ${total>=badge.threshold?'active':'locked'}`}>
-        <img src={badge.src} alt={badge.label} />
-        <div>
-          <strong>{badge.label}</strong>
-          <small>{badge.helper}</small>
+    <div className={`${styles.goalGrid} ${layout==='mvp'?styles.goalGridMvp:layout==='podium'?styles.goalGridPodium:''}`}>
+      {SALES_BADGES.map((badge)=>{
+        const unlocked=total>=badge.threshold
+        return <div key={badge.threshold} className={`${styles.goalCard} ${layout==='mvp'?styles.goalCardMvp:layout==='podium'?styles.goalCardPodium:''} ${unlocked?styles.unlocked:styles.locked}`}>
+          <div className={`${styles.iconWrap} ${layout==='mvp'?styles.iconWrapMvp:layout==='podium'?styles.iconWrapPodium:''}`}>
+            <img src={badge.src} alt={badge.label} className={`${styles.icon} ${layout==='mvp'?styles.iconMvp:layout==='podium'?styles.iconPodium:''}`} />
+          </div>
+          <div className={styles.copy}>
+            <strong className={`${styles.label} ${layout==='mvp'?styles.labelMvp:layout==='podium'?styles.labelPodium:''}`}>{badge.label}</strong>
+            <small className={`${styles.helper} ${layout==='mvp'?styles.helperMvp:layout==='podium'?styles.helperPodium:''}`}>{badge.helper}</small>
+          </div>
         </div>
-      </div>)}
+      })}
     </div>
   </div>
 }

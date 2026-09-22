@@ -4,6 +4,7 @@ import { brl, pct } from '@/lib/format'
 import LiveRefresh from '@/components/live-refresh'
 import FirstBloodFloater from '@/components/first-blood-floater'
 import incentiveStyles from '@/components/dashboard-incentives.module.css'
+import topThreeStyles from '@/components/top-three-ranking.module.css'
 import { normalizeGoalTiers } from '@/lib/goals'
 import { OperatorCard, OperatorScene, SalesMarks, classLabel } from '@/components/operator-card'
 
@@ -47,8 +48,8 @@ export default function DashboardView({data}:{data:any}){
 
     <div className="section-head top-three-head reveal reveal-2"><h2>Top 3 da <b>Operação</b></h2><div className="line"/><div className="meta">ranking somente de executivos cadastrados</div></div>
     {operators.length?<div className="top-three-grid reveal reveal-2">
-      {mvp&&<article className="mvp-card"><div className="mvp-aura"/><div className="mvp-rank">1º</div><div className="mvp-crown">MVP</div><div className="mvp-image"><OperatorScene op={mvp} variant="mvp"/></div><div className="mvp-copy"><div className="mvp-squad">{mvp.team_name||'SEM SQUAD'} · {classLabel(mvp)}</div><h3>{mvp.codename||mvp.full_name}</h3><strong>{mvp.full_name}</strong><div className="mvp-vgv">{brl(mvp.vgv)}</div><div className="mvp-sales">{mvp.sales_count||0} vendas aprovadas</div><SalesMarks salesCount={mvp.sales_count||0} /></div></article>}
-      {top3.slice(1).map((op:any,index:number)=><article className="podium-card" key={op.id}><div className="podium-rank">{index+2}º</div><div className="podium-image"><OperatorScene op={op} variant="podium"/></div><div className="podium-copy"><span>{op.team_name||'SEM SQUAD'} · {classLabel(op)}</span><h3>{op.codename||op.full_name}</h3><strong>{op.full_name}</strong><b>{brl(op.vgv)}</b><small>{op.sales_count||0} vendas</small><SalesMarks salesCount={op.sales_count||0} compact /></div></article>)}
+      {mvp&&<article className={`mvp-card ${topThreeStyles.mvpCard}`}><div className="mvp-aura"/><div className="mvp-rank">1º</div><div className="mvp-crown">MVP</div><div className="mvp-image"><OperatorScene op={mvp} variant="mvp"/></div><div className={`mvp-copy ${topThreeStyles.mvpCopy}`}><div className="mvp-squad">{mvp.team_name||'SEM SQUAD'} · {classLabel(mvp)}</div><h3>{mvp.codename||mvp.full_name}</h3><strong>{mvp.full_name}</strong><div className="mvp-vgv">{brl(mvp.vgv)}</div><div className="mvp-sales">{mvp.sales_count||0} vendas aprovadas</div><SalesMarks salesCount={mvp.sales_count||0} layout="mvp" /></div></article>}
+      {top3.slice(1).map((op:any,index:number)=><article className={`podium-card ${topThreeStyles.podiumCard}`} key={op.id}><div className="podium-rank">{index+2}º</div><div className="podium-image"><OperatorScene op={op} variant="podium"/></div><div className={`podium-copy ${topThreeStyles.podiumCopy}`}><span>{op.team_name||'SEM SQUAD'} · {classLabel(op)}</span><h3>{op.codename||op.full_name}</h3><strong>{op.full_name}</strong><b>{brl(op.vgv)}</b><small>{op.sales_count||0} vendas</small><SalesMarks salesCount={op.sales_count||0} compact layout="podium" /></div></article>)}
     </div>:<div className="empty-warroom reveal reveal-2">Nenhum executivo cadastrado ainda. Cadastre os executivos em Gestão para iniciar o ranking em tempo real.</div>}
 
     <div className="section-head reveal reveal-3"><h2>Metas e <b>Insígnias</b></h2><div className="line"/><div className="meta">objetivos atualizados pela gestão</div></div>
