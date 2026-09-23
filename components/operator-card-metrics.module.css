@@ -1,0 +1,90 @@
+.metrics{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 92px;
+  gap:16px;
+  align-items:end;
+  margin-top:14px;
+  padding-top:18px;
+  border-top:1px solid rgba(83,177,235,.24);
+}
+
+.metrics::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:-1px;
+  width:42%;
+  height:1px;
+  background:linear-gradient(90deg,#44c8ff,rgba(68,200,255,0));
+  box-shadow:0 0 12px rgba(68,200,255,.25);
+}
+
+.vgvMetric,
+.salesMetric{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.vgvMetric{
+  align-items:flex-start;
+}
+
+.metricEyebrow{
+  margin-bottom:6px;
+  font:700 8px/1 "JetBrains Mono",monospace;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  color:#54cbff;
+}
+
+.vgvValue{
+  display:block;
+  max-width:100%;
+  font:900 clamp(29px,2.35vw,44px)/.9 "Barlow Condensed",sans-serif;
+  letter-spacing:-.02em;
+  color:#f7fbff;
+  white-space:nowrap;
+  text-shadow:
+    0 0 16px rgba(68,200,255,.15),
+    0 7px 24px rgba(0,0,0,.36);
+}
+
+.metricCaption{
+  margin-top:8px;
+  font:600 8px/1 "JetBrains Mono",monospace;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:#62798a;
+}
+
+.salesMetric{
+  align-items:flex-end;
+  text-align:right;
+  padding-left:12px;
+  border-left:1px solid rgba(78,148,191,.17);
+}
+
+.salesValue{
+  font:900 32px/.88 "Barlow Condensed",sans-serif;
+  color:#fff;
+}
+
+.salesLabel{
+  margin-top:9px;
+  font:700 8px/1 "JetBrains Mono",monospace;
+  letter-spacing:.14em;
+  color:#657987;
+}
+
+@media(max-width:1500px){
+  .metrics{grid-template-columns:minmax(0,1fr) 76px;gap:12px}
+  .vgvValue{font-size:34px}
+  .salesValue{font-size:28px}
+}
+
+@media(max-width:520px){
+  .metrics{grid-template-columns:minmax(0,1fr) 68px}
+  .vgvValue{font-size:31px}
+}

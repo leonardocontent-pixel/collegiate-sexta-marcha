@@ -5,6 +5,7 @@ import LiveRefresh from '@/components/live-refresh'
 import FirstBloodFloater from '@/components/first-blood-floater'
 import incentiveStyles from '@/components/dashboard-incentives.module.css'
 import topThreeStyles from '@/components/top-three-ranking.module.css'
+import progressStyles from '@/components/dashboard-progress.module.css'
 import { normalizeGoalTiers } from '@/lib/goals'
 import { OperatorCard, OperatorScene, SalesMarks, classLabel } from '@/components/operator-card'
 
@@ -28,7 +29,7 @@ const DUST_PARTICLES = [
 ]
 
 export default function DashboardView({data}:{data:any}){
-  const {campaign,summary,operators,feed,viewerReward,firstBloodStats}=data
+  const {campaign,summary,operators,feed,viewerReward}=data
   const levels=normalizeGoalTiers(data.goals)
   const visibleLevels=levels.filter((level:any)=>String(level.name||'').trim().toLowerCase()!=='suprema').slice(0,3)
   const lastGoal=visibleLevels[visibleLevels.length-1]
@@ -37,6 +38,9 @@ export default function DashboardView({data}:{data:any}){
   const progress=Math.min(100,target?confirmed/target*100:0)
   const operationDone=target>0 && confirmed>=target
   const top3=operators.slice(0,3),mvp=top3[0]
+  const firstBloodRewardedExecutives=operators.filter((op:any)=>Number(op.sales_count||0)>=1).length
+  const firstBloodRewardPerExecutive=500
+  const firstBloodAccumulatedReward=firstBloodRewardedExecutives*firstBloodRewardPerExecutive
 
   return <div className="content max warroom-dashboard page-enter">
     <FirstBloodFloater viewerId={viewerReward?.viewerId} enabled={viewerReward?.firstBloodUnlocked} approvedSales={viewerReward?.approvedSales} />
@@ -90,23 +94,47 @@ export default function DashboardView({data}:{data:any}){
         <div className={incentiveStyles.cumulativeNote}>1ª venda aprovada = prêmio liberado automaticamente no painel</div>
       </div>
       <div className={incentiveStyles.metrics}>
-        <div className={incentiveStyles.metric}><span>Corretores que já garantiram</span><b>{firstBloodStats?.rewardedExecutives || 0}</b></div>
-        <div className={`${incentiveStyles.metric} ${incentiveStyles.metricAccent}`}><span>Total acumulado</span><b>{brl(firstBloodStats?.accumulatedReward || 0)}</b></div>
-        <div className={incentiveStyles.metric}><span>Prêmio por corretor</span><b>{brl(firstBloodStats?.rewardPerExecutive || 500)}</b></div>
+        <div className={incentiveStyles.metric}><span>Corretores que já garantiram</span><b>{firstBloodRewardedExecutives}</b></div>
+        <div className={`${incentiveStyles.metric} ${incentiveStyles.metricAccent}`}><span>Total acumulado</span><b>{brl(firstBloodAccumulatedReward)}</b></div>
+        <div className={incentiveStyles.metric}><span>Prêmio por corretor</span><b>{brl(firstBloodRewardPerExecutive)}</b></div>
       </div>
     </section>
 
     <div className="section-head reveal reveal-4" id="briefing"><h2>Briefing da <b>Operação</b></h2><div className="line"/><div className="meta">dados aprovados em tempo real</div></div>
     <div className="stat-grid reveal reveal-4"><div className="stat-card"><div className="label">VGV aprovado</div><div className="value">{brl(summary.confirmed_vgv)}</div><div className="hint">{summary.approved_sales||0} vendas aprovadas</div></div><div className="stat-card amber"><div className="label">Aguardando aprovação</div><div className="value">{brl(summary.pending_vgv)}</div><div className="hint">{summary.pending_sales||0} envios pendentes</div></div><div className="stat-card"><div className="label">VGV em operação</div><div className="value">{brl(summary.total_vgv)}</div><div className="hint">aprovado + pendente</div></div><div className="stat-card"><div className="label">Executivos cadastrados</div><div className="value">{summary.active_executives||operators.length}</div><div className="hint">somente perfis Executivo ativos</div></div></div>
-    <div className="progress-card war-progress reveal reveal-4">
+    <div className={`${progressStyles.generalProgress} reveal reveal-4`}>
       {operationDone&&<div className="campaign-complete-seal">Objetivo concluído</div>}
-      <div className="progress-row"><span>AVANÇO → META GERAL</span><span>{brl(confirmed)} / {brl(target)} · {pct(progress)}</span></div>
-      <div className="progress-track"><div className="progress-fill animated-progress animated-meter" style={{'--target-width':`${progress}%`} as CSSProperties}/></div>
+      <div className={progressStyles.progressHeader}>
+        <div>
+          <span className={progressStyles.progressKicker}>AVANÇO → META GERAL</span>
+          <strong className={progressStyles.progressTitle}>{pct(progress)} concluído</strong>
+        </div>
+        <div className={progressStyles.progressNumbers}>
+          <span>{brl(confirmed)}</span>
+          <i>/</i>
+          <span>{brl(target)}</span>
+        </div>
+      </div>
+
+      <div className={progressStyles.track} aria-label={`Avanço da meta geral: ${pct(progress)}`}>
+        <div className={progressStyles.fill} style={{width:`${progress}%`}}>
+          <span className={progressStyles.scan}/>
+          <span className={progressStyles.glow}/>
+          {progress>=9&&<b className={progressStyles.percentInside}>{pct(progress)}</b>}
+        </div>
+        {progress<9&&<b className={progressStyles.percentOutside} style={{left:`calc(${progress}% + 8px)`}}>{pct(progress)}</b>}
+      </div>
+
+      <div className={progressStyles.scale}>
+        <span>R$ 0</span>
+        <span>PROGRESSO APROVADO</span>
+        <span>{brl(target)}</span>
+      </div>
     </div>
 
     <div className="warroom-columns reveal reveal-5">
       <section><div className="section-head"><h2>Esquadrão <b>Completo</b></h2><div className="line"/><div className="meta">{operators.length} executivos</div></div><div className="squad-grid compact-squad">{operators.map((op:any,index:number)=><OperatorCard key={op.id} op={op} index={index} showPending={false} />)}</div></section>
-      <aside className="live-feed-panel"><div className="section-head"><h2>Feed <b>Ao Vivo</b></h2><div className="line"/></div><div className="live-feed-list">{(feed||[]).map((item:any)=><div className={`feed-item ${item.approval_status}`} key={item.id}><span className="feed-dot"/><div><strong>{item.profiles?.full_name||'Executivo'}</strong><small>{item.approval_status==='approved'?'venda aprovada':item.approval_status==='pending'?'venda aguardando aprovação':'registro rejeitado'} · {item.development}</small>{item.approval_status==='approved'&&<div style={{display:'inline-flex',alignItems:'center',gap:6,marginTop:8,padding:'5px 8px',border:'1px solid rgba(107,255,159,.16)',background:'rgba(86,255,142,.08)',color:'#baffcb',font:'700 9px JetBrains Mono',letterSpacing:'.08em',textTransform:'uppercase'}}><img src="/assets/feed-mission-completed.png" alt="Missão cumprida" style={{width:22,height:22,objectFit:'contain'}} /><span>Missão cumprida</span></div>}</div><b>{brl(item.vgv)}</b></div>)}{!(feed||[]).length&&<div className="feed-empty">As novas vendas aparecerão aqui assim que forem enviadas.</div>}</div></aside>
+      <aside className="live-feed-panel"><div className="section-head"><h2>Feed <b>Ao Vivo</b></h2><div className="line"/></div><div className="live-feed-list">{(feed||[]).map((item:any)=><div className={`feed-item ${item.approval_status}`} key={item.id}><span className="feed-dot"/><div><strong>{item.profiles?.full_name||'Executivo'}</strong><small>{item.approval_status==='approved'?'venda aprovada':item.approval_status==='pending'?'venda aguardando aprovação':'registro rejeitado'} · {item.development}</small>{item.approval_status==='approved'&&<div style={{display:'inline-flex',alignItems:'center',gap:10,marginTop:10,padding:'8px 12px',border:'1px solid rgba(107,255,159,.22)',background:'linear-gradient(180deg, rgba(86,255,142,.14), rgba(86,255,142,.07))',color:'#d7ffe4',boxShadow:'0 0 18px rgba(86,255,142,.08) inset, 0 0 14px rgba(86,255,142,.04)',font:'800 11px JetBrains Mono',letterSpacing:'.08em',textTransform:'uppercase'}}><img src="/assets/feed-mission-completed.png" alt="Missão cumprida" style={{width:34,height:34,objectFit:'contain',display:'block'}} /><span>Missão cumprida</span></div>}</div><b>{brl(item.vgv)}</b></div>)}{!(feed||[]).length&&<div className="feed-empty">As novas vendas aparecerão aqui assim que forem enviadas.</div>}</div></aside>
     </div>
 
     <div className="warroom-ticker reveal reveal-5"><span>QUEM EXECUTA, VENDE</span><i/> <span>PESSOAS · PROCESSOS · VENDAS</span><i/> <span>CRESCIMENTO EM TEMPO REAL</span><i/> <span>MENFE</span></div>

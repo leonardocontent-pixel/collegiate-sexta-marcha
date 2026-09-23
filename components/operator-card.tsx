@@ -14,12 +14,22 @@ const BG_SCENES:Record<string,string> = {
   command:'/assets/avatar-bg-command.webp',
 }
 
-const SALES_BADGES=[
-  { threshold:1, label:'First Blood', src:'/assets/sales-badge-first-blood.png', helper:'1ª venda' },
-  { threshold:3, label:'Multikill', src:'/assets/sales-badge-3.png', helper:'3 vendas' },
-  { threshold:5, label:'Rampage', src:'/assets/sales-badge-5.png', helper:'5 vendas' },
-  { threshold:10, label:'Domination', src:'/assets/sales-badge-10.png', helper:'10 vendas' },
+export const SALES_BADGES=[
+  { threshold:1, label:'First Blood', src:'/assets/sales-badge-first-blood.png', helper:'1ª venda', motivator:'Missão iniciada com sucesso. Continue pressionando e busque a próxima insígnia.' },
+  { threshold:3, label:'Multikill', src:'/assets/sales-badge-3.png', helper:'3 vendas', motivator:'Você engatou o ritmo da operação. Mantenha a sequência e avance para Rampage.' },
+  { threshold:5, label:'Rampage', src:'/assets/sales-badge-5.png', helper:'5 vendas', motivator:'Excelente cadência. Seu próximo passo é dominar o placar com 10 vendas.' },
+  { threshold:10, label:'Domination', src:'/assets/sales-badge-10.png', helper:'10 vendas', motivator:'Patamar máximo das insígnias de vendas alcançado. Agora é acelerar ainda mais o VGV.' },
 ]
+
+export function getLatestUnlockedBadge(salesCount:number){
+  const total=Math.max(0, Number(salesCount||0))
+  return [...SALES_BADGES].reverse().find((badge)=>total>=badge.threshold) || null
+}
+
+export function getNextBadge(salesCount:number){
+  const total=Math.max(0, Number(salesCount||0))
+  return SALES_BADGES.find((badge)=>total<badge.threshold) || null
+}
 
 export function loadoutConfig(op:any){
   return LOADOUT_ART[op?.selected_loadout || 'assault'] || LOADOUT_ART.assault
@@ -65,9 +75,52 @@ export function OperatorScene({op,variant='card'}:{op:any;variant?:'mvp'|'podium
   </div>
 }
 
+function FeaturedSalesBadge({salesCount,layout='card'}:{salesCount:number;layout?:'card'|'mvp'|'podium'}){
+  const total=Math.max(0, Number(salesCount||0))
+  const latestBadge=getLatestUnlockedBadge(total)
+  const nextBadge=getNextBadge(total)
+  const featuredBadge=latestBadge || SALES_BADGES[0]
+  const unlocked=Boolean(latestBadge)
+  const remaining=Math.max(0, (nextBadge?.threshold || featuredBadge.threshold) - total)
+  const isTop = layout==='mvp' || layout==='podium'
+
+  return <div className={`${styles.featuredGoalWrap} ${layout==='mvp'?styles.featuredGoalWrapMvp:''} ${layout==='podium'?styles.featuredGoalWrapPodium:''}`}>
+    <div className={styles.featuredGoalHead}>
+      <span>{unlocked?'ÚLTIMA INSÍGNIA':'PRÓXIMA INSÍGNIA'}</span>
+      <b>{total} venda{total===1?'':'s'}</b>
+    </div>
+
+    <div className={`${styles.featuredGoalCard} ${layout==='mvp'?styles.featuredGoalCardMvp:''} ${layout==='podium'?styles.featuredGoalCardPodium:''} ${unlocked?styles.unlocked:styles.locked}`}>
+      <div className={`${styles.featuredIconWrap} ${layout==='mvp'?styles.featuredIconWrapMvp:''} ${layout==='podium'?styles.featuredIconWrapPodium:''}`}>
+        <img src={featuredBadge.src} alt={featuredBadge.label} className={`${styles.featuredIcon} ${layout==='mvp'?styles.featuredIconMvp:''} ${layout==='podium'?styles.featuredIconPodium:''}`} />
+      </div>
+      <div className={styles.featuredCopyWrap}>
+        <strong className={`${styles.featuredLabel} ${layout==='mvp'?styles.featuredLabelMvp:''} ${layout==='podium'?styles.featuredLabelPodium:''}`}>{featuredBadge.label}</strong>
+        <small className={`${styles.featuredHelper} ${layout==='mvp'?styles.featuredHelperMvp:''} ${layout==='podium'?styles.featuredHelperPodium:''}`}>{featuredBadge.helper}</small>
+        <span className={`${styles.featuredStatus} ${layout==='mvp'?styles.featuredStatusMvp:''} ${layout==='podium'?styles.featuredStatusPodium:''}`}>{unlocked?'insígnia ativa':'ainda bloqueada'}</span>
+      </div>
+    </div>
+
+    <div className={`${styles.featuredNextHint} ${isTop?styles.featuredNextHintTop:''}`}>
+      {nextBadge
+        ? <>
+            <span className={styles.featuredNextKicker}>PRÓXIMO OBJETIVO</span>
+            <b>{nextBadge.label}</b>
+            <small>faltam {remaining} venda{remaining===1?'':'s'} para desbloquear</small>
+          </>
+        : <>
+            <span className={styles.featuredNextKicker}>PATAMAR MÁXIMO</span>
+            <b>todas as insígnias progressivas já foram conquistadas</b>
+            <small>mantenha o ritmo e acelere o VGV</small>
+          </>}
+    </div>
+  </div>
+}
+
 export function SalesMarks({salesCount,compact=false,layout='card'}:{salesCount:number;compact?:boolean;layout?:'card'|'mvp'|'podium'}){
   const total=Math.max(0, Number(salesCount||0))
   const visible=Math.min(total,12)
+
   return <div className={`sales-marks ${compact?'compact':''}`}>
     <div className="sales-marks-head">
       <span>ABATES COMERCIAIS</span>
@@ -78,20 +131,7 @@ export function SalesMarks({salesCount,compact=false,layout='card'}:{salesCount:
       {total===0 && <span className="sales-skull-empty">sem marcas</span>}
       {total>12 && <span className="sales-skull-extra">+{total-12}</span>}
     </div>
-    <div className={`${styles.goalGrid} ${layout==='mvp'?styles.goalGridMvp:layout==='podium'?styles.goalGridPodium:''}`}>
-      {SALES_BADGES.map((badge)=>{
-        const unlocked=total>=badge.threshold
-        return <div key={badge.threshold} className={`${styles.goalCard} ${layout==='mvp'?styles.goalCardMvp:layout==='podium'?styles.goalCardPodium:''} ${unlocked?styles.unlocked:styles.locked}`}>
-          <div className={`${styles.iconWrap} ${layout==='mvp'?styles.iconWrapMvp:layout==='podium'?styles.iconWrapPodium:''}`}>
-            <img src={badge.src} alt={badge.label} className={`${styles.icon} ${layout==='mvp'?styles.iconMvp:layout==='podium'?styles.iconPodium:''}`} />
-          </div>
-          <div className={styles.copy}>
-            <strong className={`${styles.label} ${layout==='mvp'?styles.labelMvp:layout==='podium'?styles.labelPodium:''}`}>{badge.label}</strong>
-            <small className={`${styles.helper} ${layout==='mvp'?styles.helperMvp:layout==='podium'?styles.helperPodium:''}`}>{badge.helper}</small>
-          </div>
-        </div>
-      })}
-    </div>
+    <FeaturedSalesBadge salesCount={total} layout={layout} />
   </div>
 }
 

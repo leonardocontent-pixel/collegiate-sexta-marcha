@@ -1,4 +1,3 @@
-/* Ajustes exclusivos do TOP 3 para evitar sobreposição entre rank, nome e micro goals */
 .mvpCard,
 .podiumCard{
   min-height:470px !important;
@@ -8,8 +7,8 @@
   left:24px !important;
   right:auto !important;
   bottom:18px !important;
-  width:58% !important;
-  max-width:58% !important;
+  width:60% !important;
+  max-width:60% !important;
 }
 
 .mvpCopy :global(.mvp-squad){
@@ -45,7 +44,7 @@
   width:100% !important;
   max-width:none !important;
   margin-top:8px !important;
-  padding:9px 10px 10px !important;
+  padding:10px 10px 11px !important;
 }
 
 .podiumCopy{
