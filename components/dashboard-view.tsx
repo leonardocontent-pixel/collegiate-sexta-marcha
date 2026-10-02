@@ -1,9 +1,9 @@
-import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { brl, pct } from '@/lib/format'
 import LiveRefresh from '@/components/live-refresh'
 import FirstBloodFloater from '@/components/first-blood-floater'
 import incentiveStyles from '@/components/dashboard-incentives.module.css'
+import progressStyles from '@/components/dashboard-progress.module.css'
 import { normalizeGoalTiers } from '@/lib/goals'
 import { OperatorCard, OperatorScene, SalesMarks, classLabel } from '@/components/operator-card'
 
@@ -97,10 +97,34 @@ export default function DashboardView({data}:{data:any}){
 
     <div className="section-head reveal reveal-4" id="briefing"><h2>Briefing da <b>Operação</b></h2><div className="line"/><div className="meta">dados aprovados em tempo real</div></div>
     <div className="stat-grid reveal reveal-4"><div className="stat-card"><div className="label">VGV aprovado</div><div className="value">{brl(summary.confirmed_vgv)}</div><div className="hint">{summary.approved_sales||0} vendas aprovadas</div></div><div className="stat-card amber"><div className="label">Aguardando aprovação</div><div className="value">{brl(summary.pending_vgv)}</div><div className="hint">{summary.pending_sales||0} envios pendentes</div></div><div className="stat-card"><div className="label">VGV em operação</div><div className="value">{brl(summary.total_vgv)}</div><div className="hint">aprovado + pendente</div></div><div className="stat-card"><div className="label">Executivos cadastrados</div><div className="value">{summary.active_executives||operators.length}</div><div className="hint">somente perfis Executivo ativos</div></div></div>
-    <div className="progress-card war-progress reveal reveal-4">
+    <div className={`${progressStyles.generalProgress} reveal reveal-4`}>
       {operationDone&&<div className="campaign-complete-seal">Objetivo concluído</div>}
-      <div className="progress-row"><span>AVANÇO → META GERAL</span><span>{brl(confirmed)} / {brl(target)} · {pct(progress)}</span></div>
-      <div className="progress-track"><div className="progress-fill animated-progress animated-meter" style={{'--target-width':`${progress}%`} as CSSProperties}/></div>
+      <div className={progressStyles.progressHeader}>
+        <div>
+          <span className={progressStyles.progressKicker}>AVANÇO → META GERAL</span>
+          <strong className={progressStyles.progressTitle}>{pct(progress)} concluído</strong>
+        </div>
+        <div className={progressStyles.progressNumbers}>
+          <span>{brl(confirmed)}</span>
+          <i>/</i>
+          <span>{brl(target)}</span>
+        </div>
+      </div>
+
+      <div className={progressStyles.track} aria-label={`Avanço da meta geral: ${pct(progress)}`}>
+        <div className={progressStyles.fill} style={{width:`${progress}%`}}>
+          <span className={progressStyles.scan}/>
+          <span className={progressStyles.glow}/>
+          {progress>=9&&<b className={progressStyles.percentInside}>{pct(progress)}</b>}
+        </div>
+        {progress<9&&<b className={progressStyles.percentOutside} style={{left:`calc(${progress}% + 8px)`}}>{pct(progress)}</b>}
+      </div>
+
+      <div className={progressStyles.scale}>
+        <span>R$ 0</span>
+        <span>PROGRESSO APROVADO</span>
+        <span>{brl(target)}</span>
+      </div>
     </div>
 
     <div className="warroom-columns reveal reveal-5">
